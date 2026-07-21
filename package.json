@@ -19,7 +19,12 @@
     "test:hedera:testnet": "pnpm --filter @agripay/live-test build && node apps/live-test/dist/index.js",
     "db:migrate": "pnpm --filter @agripay/storage build && node packages/storage/dist/cli.js migrate",
     "db:backup": "pnpm --filter @agripay/storage build && node packages/storage/dist/cli.js backup",
+    "db:check": "pnpm --filter @agripay/storage build && node packages/storage/dist/cli.js check",
+    "db:verify-backup": "pnpm --filter @agripay/storage build && node packages/storage/dist/cli.js verify-backup",
     "db:restore": "pnpm --filter @agripay/storage build && node packages/storage/dist/cli.js restore",
+    "auth:hash-password": "pnpm --filter @agripay/security build && node packages/security/dist/hash-cli.js",
+    "payments:reconcile": "pnpm --filter @agripay/payments build && node packages/payments/dist/reconcile-cli.js",
+    "sbom": "node scripts/generate-sbom.mjs",
     "groq:models": "pnpm --filter @agripay/planner build && node packages/planner/dist/cli.js models",
     "demo:hedera:multi-resource": "pnpm --filter @agripay/live-test build && node apps/live-test/dist/multi.js",
     "web:dev": "pnpm --filter @agripay/web dev",
@@ -35,6 +40,13 @@
     "prettier": "3.6.2",
     "typescript": "5.8.3",
     "typescript-eslint": "8.38.0",
-    "vitest": "3.2.4"
+    "vitest": "3.2.6"
+  },
+  "pnpm": {
+    "overrides": {
+      "@grpc/grpc-js": "1.12.7",
+      "bn.js": "5.2.3",
+      "protobufjs": "7.6.5"
+    }
   }
 }
