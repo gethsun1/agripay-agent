@@ -190,6 +190,11 @@ export class DurableStore {
       | Record<string, unknown>
       | undefined;
   }
+  getTaskBySubmissionKey(key: string): Record<string, unknown> | undefined {
+    return this.db.prepare("SELECT * FROM tasks WHERE submission_key=?").get(key) as
+      | Record<string, unknown>
+      | undefined;
+  }
   listEvents(id: string): Record<string, unknown>[] {
     return this.db.prepare("SELECT * FROM events WHERE task_id=? ORDER BY id").all(id) as Record<
       string,
@@ -229,6 +234,36 @@ export class DurableStore {
     return this.db
       .prepare("SELECT * FROM purchases WHERE task_id=? ORDER BY priority,resource_id")
       .all(taskId) as Record<string, unknown>[];
+  }
+  listReceipts(input: {
+    limit: number;
+    offset: number;
+    resourceId?: string;
+    state?: string;
+  }): Record<string, unknown>[] {
+    const clauses = ["receipt_json IS NOT NULL"];
+    const values: (string | number)[] = [];
+    if (input.resourceId) {
+      clauses.push("resource_id=?");
+      values.push(input.resourceId);
+    }
+    if (input.state) {
+      clauses.push("settlement_state=?");
+      values.push(input.state);
+    }
+    values.push(input.limit, input.offset);
+    return this.db
+      .prepare(
+        `SELECT task_id,resource_id,receipt_json,created_at,updated_at FROM purchases WHERE ${clauses.join(" AND ")} ORDER BY updated_at DESC LIMIT ? OFFSET ?`,
+      )
+      .all(...values) as Record<string, unknown>[];
+  }
+  getReceipt(transactionId: string): Record<string, unknown> | undefined {
+    return this.db
+      .prepare(
+        "SELECT task_id,resource_id,receipt_json,created_at,updated_at FROM purchases WHERE transaction_id=? AND receipt_json IS NOT NULL",
+      )
+      .get(transactionId) as Record<string, unknown> | undefined;
   }
   updatePurchase(
     taskId: string,
