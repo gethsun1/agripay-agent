@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 import type { PaymentRequirements } from "@agripay/schemas";
-import { evaluatePayment, type PolicyContext } from "./index.js";
+import { evaluatePayment, evaluateTask, type PolicyContext } from "./index.js";
 
 const requirements: PaymentRequirements = {
   scheme: "exact",
@@ -76,5 +76,50 @@ describe("evaluatePayment", () => {
     expect(
       evaluatePayment(context({ requirements: changedRequirements({ asset: "USDC" }) })),
     ).toMatchObject({ code: "ASSET_DENIED" });
+  });
+  it("rejects a per-resource limit", () => {
+    expect(evaluatePayment(context({ maxResourceTinybars: 1n }))).toMatchObject({
+      code: "RESOURCE_BUDGET",
+    });
+  });
+  it("rejects a period limit", () => {
+    expect(evaluatePayment(context({ periodSpentTinybars: 99_000_000n }))).toMatchObject({
+      code: "PERIOD_BUDGET",
+    });
+  });
+  it("rejects too many payments", () => {
+    expect(evaluatePayment(context({ paymentCount: 3, maxPaymentsPerTask: 3 }))).toMatchObject({
+      code: "PAYMENT_COUNT",
+    });
+  });
+  it("rejects insufficient balance", () => {
+    expect(evaluatePayment(context({ availableBalanceTinybars: 1n }))).toMatchObject({
+      code: "INSUFFICIENT_BALANCE",
+    });
+  });
+});
+
+describe("evaluateTask", () => {
+  const prices = {
+    "weather-risk": 5_000_000n,
+    "disease-risk": 7_000_000n,
+    "market-intelligence": 4_000_000n,
+  } as const;
+  const base = {
+    resources: ["weather-risk", "disease-risk", "market-intelligence"] as const,
+    prices,
+    allowedResources: new Set(["weather-risk", "disease-risk", "market-intelligence"] as const),
+    maxTaskTinybars: 16_000_000n,
+    maxPaymentsPerTask: 3,
+    periodSpentTinybars: 0n,
+    maxPeriodTinybars: 100_000_000n,
+  };
+  it("approves an exact three-resource task", () => {
+    expect(evaluateTask(base)).toEqual({ approved: true, estimatedTinybars: 16_000_000n });
+  });
+  it("rejects the whole over-budget task", () => {
+    expect(evaluateTask({ ...base, maxTaskTinybars: 15_999_999n })).toMatchObject({
+      code: "TASK_BUDGET",
+    });
   });
 });

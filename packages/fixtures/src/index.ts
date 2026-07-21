@@ -1,4 +1,4 @@
-import type { ResourceId, WeatherRisk } from "@agripay/schemas";
+import type { DiseaseRisk, MarketIntelligence, ResourceId, WeatherRisk } from "@agripay/schemas";
 
 export interface ResourceDefinition {
   id: ResourceId;
@@ -20,15 +20,44 @@ export const RESOURCE_REGISTRY: Readonly<Record<ResourceId, ResourceDefinition>>
   "disease-risk": {
     id: "disease-risk",
     path: "/api/resources/disease-risk",
-    priceTinybars: 5_000_000n,
+    priceTinybars: 7_000_000n,
     description: "Demonstration crop disease-risk intelligence",
   },
   "market-intelligence": {
     id: "market-intelligence",
     path: "/api/resources/market-intelligence",
-    priceTinybars: 5_000_000n,
+    priceTinybars: 4_000_000n,
     description: "Demonstration agricultural market intelligence",
   },
+};
+
+export const NANDI_MAIZE_DISEASE: DiseaseRisk = {
+  county: "Nandi",
+  crop: "maize",
+  riskLevel: "moderate",
+  factors: ["humid canopy after rainfall", "demonstration history of leaf-spot pressure"],
+  scoutingActions: ["inspect lower leaves twice weekly", "record affected plants by field section"],
+  preventionActions: ["use clean seed", "maintain field hygiene and recommended spacing"],
+  confidence: "moderate",
+  provenance: "curated demonstration fixture",
+  fixtureVersion: "nandi-maize-disease-v1-2026-07",
+  disclaimer: DEMO_DISCLOSURE,
+};
+
+export const NANDI_MAIZE_MARKET: MarketIntelligence = {
+  county: "Nandi",
+  commodity: "maize",
+  priceRangeKesPer90Kg: { min: 3200, max: 3700 },
+  demand: "steady",
+  supply: "balanced",
+  timing: "The demonstration scenario favours comparing buyer quotes before staggered sales.",
+  risks: [
+    "fixture prices are not live quotes",
+    "transport and moisture deductions can alter proceeds",
+  ],
+  provenance: "curated demonstration fixture",
+  fixtureVersion: "nandi-maize-market-v1-2026-07",
+  disclaimer: DEMO_DISCLOSURE,
 };
 
 export const NANDI_MAIZE_WEATHER: WeatherRisk = {
@@ -54,5 +83,20 @@ export const NANDI_MAIZE_WEATHER: WeatherRisk = {
 export function getWeatherFixture(county: string, crop: string): WeatherRisk | undefined {
   return county.toLowerCase() === "nandi" && crop.toLowerCase() === "maize"
     ? NANDI_MAIZE_WEATHER
+    : undefined;
+}
+
+export function getDiseaseFixture(county: string, crop: string): DiseaseRisk | undefined {
+  return county.toLowerCase() === "nandi" && crop.toLowerCase() === "maize"
+    ? NANDI_MAIZE_DISEASE
+    : undefined;
+}
+
+export function getMarketFixture(
+  county: string,
+  commodity: string,
+): MarketIntelligence | undefined {
+  return county.toLowerCase() === "nandi" && commodity.toLowerCase() === "maize"
+    ? NANDI_MAIZE_MARKET
     : undefined;
 }

@@ -17,6 +17,7 @@
     "@agripay/fixtures": "workspace:*",
     "@agripay/payments": "workspace:*",
     "@agripay/schemas": "workspace:*",
+    "@agripay/storage": "workspace:*",
     "@hashgraph/sdk": "2.74.0"
   }
 }

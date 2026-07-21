@@ -84,6 +84,21 @@ describe("weather x402 vertical slice", () => {
     });
   });
 
+  it.each([
+    ["disease-risk", "crop", "7000000"],
+    ["market-intelligence", "commodity", "4000000"],
+  ])("protects %s with its registered price", async (resource, param, price) => {
+    const { resourceUrl } = await setup();
+    const response = await fetch(
+      `${resourceUrl}/api/resources/${resource}?county=Nandi&${param}=maize`,
+    );
+    expect(response.status).toBe(402);
+    expect(paymentRequiredSchema.parse(await response.json()).accepts[0]).toMatchObject({
+      resource,
+      maxAmountRequired: price,
+    });
+  });
+
   it("completes the mocked 402-policy-settlement-retry-200 lifecycle", async () => {
     const { resourceUrl, facilitatorUrl } = await setup();
     const result = await runWeatherPurchase({
