@@ -15,8 +15,9 @@
     "format:write": "prettier --write .",
     "test": "vitest run",
     "test:watch": "vitest",
-    "test:hedera:testnet": "node scripts/require-testnet.mjs && vitest run --config vitest.hedera.config.ts",
-    "check": "pnpm format && pnpm lint && pnpm typecheck && pnpm test && pnpm build"
+    "hedera:provision": "pnpm --filter @agripay/payments build && node packages/payments/dist/provision-cli.js",
+    "test:hedera:testnet": "pnpm --filter @agripay/live-test build && node apps/live-test/dist/index.js",
+    "check": "pnpm format && pnpm lint && pnpm typecheck && pnpm build && pnpm test"
   },
   "devDependencies": {
     "@eslint/js": "9.31.0",

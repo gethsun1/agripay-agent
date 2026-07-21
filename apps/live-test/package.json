@@ -1,0 +1,17 @@
+{
+  "name": "@agripay/live-test",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "build": "tsc -p tsconfig.json",
+    "typecheck": "tsc -p tsconfig.json --noEmit"
+  },
+  "dependencies": {
+    "@agripay/agent": "workspace:*",
+    "@agripay/facilitator": "workspace:*",
+    "@agripay/payments": "workspace:*",
+    "@agripay/resource-server": "workspace:*",
+    "@hashgraph/sdk": "2.74.0"
+  }
+}

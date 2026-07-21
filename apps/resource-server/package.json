@@ -1,5 +1,5 @@
 {
-  "name": "@agripay/policy",
+  "name": "@agripay/resource-server",
   "version": "0.1.0",
   "private": true,
   "type": "module",
@@ -12,6 +12,11 @@
     "typecheck": "tsc -p tsconfig.json --noEmit"
   },
   "dependencies": {
-    "@agripay/schemas": "workspace:*"
+    "@agripay/agent": "workspace:*",
+    "@agripay/facilitator": "workspace:*",
+    "@agripay/fixtures": "workspace:*",
+    "@agripay/payments": "workspace:*",
+    "@agripay/schemas": "workspace:*",
+    "@hashgraph/sdk": "2.74.0"
   }
 }

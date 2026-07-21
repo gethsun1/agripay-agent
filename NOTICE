@@ -1,0 +1,11 @@
+AgriPay Agent
+Copyright 2026 AgriPay Agent contributors
+
+This product includes software adapted from x402 and the Hedera x402 fork:
+
+- x402, Copyright 2024 Coinbase, Inc., Apache License 2.0
+- hedera-dev/x402-hedera commit d11dc65ab12fbdf644f1b2dba40fdd05f5a9ab1,
+  Apache License 2.0
+
+AgriPay's adapted Hedera payment flow adds application-specific transfer, signature,
+expiry, recipient, amount, and replay validation. See docs/adr/0002-hedera-exact-verification.md.

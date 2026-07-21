@@ -1,5 +1,5 @@
 {
-  "name": "@agripay/policy",
+  "name": "@agripay/agent",
   "version": "0.1.0",
   "private": true,
   "type": "module",
@@ -12,6 +12,9 @@
     "typecheck": "tsc -p tsconfig.json --noEmit"
   },
   "dependencies": {
+    "@agripay/fixtures": "workspace:*",
+    "@agripay/payments": "workspace:*",
+    "@agripay/policy": "workspace:*",
     "@agripay/schemas": "workspace:*"
   }
 }

@@ -3,15 +3,16 @@ import type { PaymentRequirements } from "@agripay/schemas";
 import { evaluatePayment, type PolicyContext } from "./index.js";
 
 const requirements: PaymentRequirements = {
-  x402Version: 1,
   scheme: "exact",
   network: "hedera-testnet",
   asset: "HBAR",
-  amount: "5000000",
+  maxAmountRequired: "5000000",
   payTo: "0.0.1002",
   resource: "weather-risk",
+  description: "Demonstration weather risk",
   expiresAt: "2030-01-01T00:00:00.000Z",
   nonce: "0123456789abcdef",
+  extra: { feePayer: "0.0.1003" },
 };
 
 const context = (overrides: Partial<PolicyContext> = {}): PolicyContext => ({

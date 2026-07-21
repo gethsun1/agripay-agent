@@ -9,7 +9,8 @@ test-results/
 .env.*
 !.env.example
 !.env.*.example
+.secrets/
 *.sqlite
 *.sqlite-*
+data/*.json
 .DS_Store
-

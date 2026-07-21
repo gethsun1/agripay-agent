@@ -34,7 +34,7 @@ export function evaluatePayment(context: PolicyContext): PolicyDecision {
   if (requirement.asset !== "HBAR") return reject("ASSET_DENIED", "Asset is not approved");
   if (requirement.payTo !== context.expectedSeller)
     return reject("SELLER_DENIED", "Seller is not approved");
-  const amount = BigInt(requirement.amount);
+  const amount = BigInt(requirement.maxAmountRequired);
   if (amount !== context.expectedPriceTinybars)
     return reject("PRICE_CHANGED", "Price differs from the registry");
   if (new Date(requirement.expiresAt).getTime() <= context.now.getTime())
