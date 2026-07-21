@@ -21,6 +21,7 @@ async function request<T>(path: string, schema: z.ZodType<T>, init?: RequestInit
   headers.set("accept", "application/json");
   const response = await fetch(`${base}${path}`, {
     ...init,
+    credentials: "include",
     headers,
     signal: init?.signal ?? AbortSignal.timeout(10_000),
   });
@@ -64,13 +65,33 @@ export const eventSchema = z.object({
 export type Task = z.infer<typeof taskSchema>;
 export type TaskEvent = z.infer<typeof eventSchema>;
 export const api = {
-  createTask: (question: string, submissionKey: string, confirmed: boolean) =>
+  csrf: () => request("/api/auth/csrf", z.object({ csrfToken: z.string() })),
+  login: (password: string, csrfToken: string) =>
+    request(
+      "/api/operator/login",
+      z.object({ csrfToken: z.string(), authenticated: z.literal(true) }),
+      {
+        method: "POST",
+        headers: { "content-type": "application/json", "x-csrf-token": csrfToken },
+        body: JSON.stringify({ password }),
+      },
+    ),
+  logout: (csrfToken: string) =>
+    request("/api/operator/logout", z.object({ authenticated: z.literal(false) }), {
+      method: "POST",
+      headers: { "x-csrf-token": csrfToken },
+    }),
+  createTask: (question: string, submissionKey: string, confirmed: boolean, csrfToken: string) =>
     request(
       "/api/agent/tasks",
       z.object({ taskId: z.string(), correlationId: z.string(), state: z.string() }),
       {
         method: "POST",
-        headers: { "content-type": "application/json", "idempotency-key": submissionKey },
+        headers: {
+          "content-type": "application/json",
+          "idempotency-key": submissionKey,
+          "x-csrf-token": csrfToken,
+        },
         body: JSON.stringify({ question, submissionKey, confirmed, maxSpendTinybars: "16000000" }),
       },
     ),

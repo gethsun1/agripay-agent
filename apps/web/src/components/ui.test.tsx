@@ -21,7 +21,8 @@ describe("accessible frontend", () => {
     const submit = screen.getByRole("button", { name: /confirm & run/i });
     expect(submit).toBeDisabled();
     fireEvent.click(screen.getByRole("checkbox"));
-    expect(submit).toBeEnabled();
+    expect(submit).toBeDisabled();
+    expect(screen.getByLabelText(/operator passphrase/i)).toBeInTheDocument();
     fireEvent.click(screen.getByRole("button", { name: "2" }));
     expect(screen.getByLabelText(/what decision/i)).toHaveValue(
       "What disease risks should I watch for in maize?",

@@ -17,6 +17,9 @@ export function Agent() {
   );
   const [mode, setMode] = useState<Mode>("mock");
   const [confirmed, setConfirmed] = useState(false);
+  const [operatorPassword, setOperatorPassword] = useState("");
+  const [operatorCsrf, setOperatorCsrf] = useState<string | null>(null);
+  const [authPending, setAuthPending] = useState(false);
   const [submitting, setSubmitting] = useState(false);
   const [taskId, setTaskId] = useState<string | null>(() =>
     new URLSearchParams(location.search).get("task"),
@@ -34,7 +37,7 @@ export function Agent() {
     question.trim().length >= 10 &&
     question.length <= 1000 &&
     !submitting &&
-    (mode === "mock" || confirmed);
+    (mode === "mock" || (confirmed && Boolean(operatorCsrf)));
   useEffect(() => {
     if (!taskId) return;
     let cancelled = false,
@@ -69,13 +72,29 @@ export function Agent() {
     setError("");
     try {
       const key = crypto.randomUUID();
-      const created = await api.createTask(question, key, mode === "live" && confirmed);
+      const csrfToken = mode === "live" ? operatorCsrf : (await api.csrf()).csrfToken;
+      if (!csrfToken) throw new Error("Operator authentication is required");
+      const created = await api.createTask(question, key, mode === "live" && confirmed, csrfToken);
       setTaskId(created.taskId);
       history.replaceState(null, "", `/agent?task=${encodeURIComponent(created.taskId)}`);
     } catch (e) {
       setError(e instanceof Error ? e.message : "Task creation failed");
     } finally {
       setSubmitting(false);
+    }
+  }
+  async function loginOperator() {
+    setAuthPending(true);
+    setError("");
+    try {
+      const challenge = await api.csrf();
+      const login = await api.login(operatorPassword, challenge.csrfToken);
+      setOperatorCsrf(login.csrfToken);
+      setOperatorPassword("");
+    } catch (e) {
+      setError(e instanceof Error ? e.message : "Authentication failed");
+    } finally {
+      setAuthPending(false);
     }
   }
   return (
@@ -193,22 +212,49 @@ export function Agent() {
             </div>
           </dl>
           {mode === "live" && (
-            <label className="confirm">
-              <input
-                type="checkbox"
-                checked={confirmed}
-                onChange={(e) => {
-                  setConfirmed(e.target.checked);
-                }}
-              />
-              <span>
-                I explicitly authorize this testnet task up to{" "}
-                <b>
-                  {total.toLocaleString()} tinybars ({formatTinybars(total)} HBAR)
-                </b>
-                . Refresh and recovery will not create another task.
-              </span>
-            </label>
+            <>
+              <div className="operator-login">
+                <label htmlFor="operator-password">Operator passphrase</label>
+                <input
+                  id="operator-password"
+                  type="password"
+                  autoComplete="current-password"
+                  value={operatorPassword}
+                  onChange={(e) => {
+                    setOperatorPassword(e.target.value);
+                  }}
+                  disabled={Boolean(operatorCsrf)}
+                />
+                <button
+                  type="button"
+                  className="button button-small"
+                  disabled={authPending || Boolean(operatorCsrf) || operatorPassword.length < 1}
+                  onClick={() => void loginOperator()}
+                >
+                  {operatorCsrf
+                    ? "Operator authenticated"
+                    : authPending
+                      ? "Authenticating…"
+                      : "Authenticate operator"}
+                </button>
+              </div>
+              <label className="confirm">
+                <input
+                  type="checkbox"
+                  checked={confirmed}
+                  onChange={(e) => {
+                    setConfirmed(e.target.checked);
+                  }}
+                />
+                <span>
+                  I explicitly authorize this testnet task up to{" "}
+                  <b>
+                    {total.toLocaleString()} tinybars ({formatTinybars(total)} HBAR)
+                  </b>
+                  . Refresh and recovery will not create another task.
+                </span>
+              </label>
+            </>
           )}
           <button className="button submit" disabled={!canSubmit} onClick={() => void submit()}>
             {submitting

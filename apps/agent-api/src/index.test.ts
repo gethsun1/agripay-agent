@@ -17,11 +17,11 @@ afterEach(async () =>
     ),
   ),
 );
-async function setup() {
+async function setup(mode: "mock" | "hedera-testnet" = "hedera-testnet") {
   const store = new DurableStore(":memory:");
   const server = createAgentApiServer({
     store,
-    mode: "hedera-testnet",
+    mode,
     resourceServerUrl: "http://127.0.0.1:1",
     facilitatorUrl: "http://127.0.0.1:2",
     county: "Nandi",
@@ -50,7 +50,7 @@ describe("frontend API safety contract", () => {
     });
     store.close();
   });
-  it("requires exact explicit confirmation for live task creation", async () => {
+  it("rejects unauthenticated live task creation before confirmation", async () => {
     const { url, store } = await setup();
     const response = await fetch(`${url}/api/agent/tasks`, {
       method: "POST",
@@ -62,13 +62,13 @@ describe("frontend API safety contract", () => {
         maxSpendTinybars: "16000000",
       }),
     });
-    expect(response.status).toBe(409);
-    expect(await response.json()).toMatchObject({ error: "live_confirmation_required" });
+    expect(response.status).toBe(403);
+    expect(await response.json()).toMatchObject({ error: "not_authorized" });
     expect(store.getTaskBySubmissionKey("safe-key-123")).toBeUndefined();
     store.close();
   });
   it("rejects arbitrary URLs and unknown receipt filters", async () => {
-    const { url, store } = await setup();
+    const { url, store } = await setup("mock");
     const post = await fetch(`${url}/api/agent/tasks`, {
       method: "POST",
       headers: { "content-type": "application/json" },
