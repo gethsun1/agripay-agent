@@ -1,0 +1,24 @@
+[Unit]
+Description=AgriPay Agent API
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+Type=simple
+User=agripay
+Group=agripay
+WorkingDirectory=/opt/agripay-agent/current
+EnvironmentFile=/etc/agripay/agent-api.env
+ExecStart=/usr/bin/node apps/agent-api/dist/server.js
+Restart=on-failure
+RestartSec=5
+UMask=0077
+NoNewPrivileges=true
+PrivateTmp=true
+ProtectSystem=strict
+ProtectHome=true
+ReadWritePaths=/var/lib/agripay /var/log/agripay
+RestrictSUIDSGID=true
+
+[Install]
+WantedBy=multi-user.target

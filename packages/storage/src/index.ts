@@ -1,4 +1,4 @@
-import { mkdirSync } from "node:fs";
+import { chmodSync, mkdirSync } from "node:fs";
 import { dirname, resolve } from "node:path";
 import { DatabaseSync, backup } from "node:sqlite";
 
@@ -64,6 +64,20 @@ const migrations = [
    );
    CREATE INDEX IF NOT EXISTS idx_events_task ON events(task_id,id);
    CREATE INDEX IF NOT EXISTS idx_purchases_state ON purchases(settlement_state,delivery_state);`,
+  `CREATE TABLE IF NOT EXISTS operator_sessions(
+     session_hash TEXT PRIMARY KEY, csrf_hash TEXT NOT NULL, created_at TEXT NOT NULL,
+     last_seen_at TEXT NOT NULL, idle_expires_at TEXT NOT NULL, absolute_expires_at TEXT NOT NULL,
+     revoked_at TEXT
+   );
+   CREATE TABLE IF NOT EXISTS auth_attempts(
+     source_hash TEXT NOT NULL, attempted_at TEXT NOT NULL, succeeded INTEGER NOT NULL DEFAULT 0
+   );
+   CREATE INDEX IF NOT EXISTS idx_auth_attempts_source ON auth_attempts(source_hash,attempted_at);
+   CREATE TABLE IF NOT EXISTS durable_limits(
+     bucket TEXT NOT NULL, subject_hash TEXT NOT NULL, window_start TEXT NOT NULL,
+     count INTEGER NOT NULL, amount_tinybars TEXT NOT NULL DEFAULT '0', updated_at TEXT NOT NULL,
+     PRIMARY KEY(bucket,subject_hash,window_start)
+   );`,
 ];
 
 export function databasePath(value = process.env.DATABASE_URL ?? "data/agripay.sqlite"): string {
@@ -76,8 +90,12 @@ export class DurableStore {
   readonly path: string;
   constructor(path = databasePath()) {
     this.path = path;
-    if (path !== ":memory:") mkdirSync(dirname(path), { recursive: true, mode: 0o700 });
+    if (path !== ":memory:") {
+      mkdirSync(dirname(path), { recursive: true, mode: 0o700 });
+      chmodSync(dirname(path), 0o700);
+    }
     this.db = new DatabaseSync(path);
+    if (path !== ":memory:") chmodSync(path, 0o600);
     this.db.exec(
       "PRAGMA foreign_keys=ON; PRAGMA journal_mode=WAL; PRAGMA synchronous=FULL; PRAGMA busy_timeout=5000;",
     );
@@ -111,6 +129,7 @@ export class DurableStore {
     }
   }
   close(): void {
+    this.checkpoint();
     this.db.close();
   }
   createTask(input: {
@@ -195,6 +214,107 @@ export class DurableStore {
       | Record<string, unknown>
       | undefined;
   }
+  createSession(input: {
+    sessionHash: string;
+    csrfHash: string;
+    idleExpiresAt: string;
+    absoluteExpiresAt: string;
+  }): void {
+    const now = new Date().toISOString();
+    this.db
+      .prepare(
+        "INSERT INTO operator_sessions(session_hash,csrf_hash,created_at,last_seen_at,idle_expires_at,absolute_expires_at) VALUES(?,?,?,?,?,?)",
+      )
+      .run(
+        input.sessionHash,
+        input.csrfHash,
+        now,
+        now,
+        input.idleExpiresAt,
+        input.absoluteExpiresAt,
+      );
+  }
+  getSession(sessionHash: string): Record<string, unknown> | undefined {
+    return this.db
+      .prepare("SELECT * FROM operator_sessions WHERE session_hash=? AND revoked_at IS NULL")
+      .get(sessionHash) as Record<string, unknown> | undefined;
+  }
+  touchSession(sessionHash: string, idleExpiresAt: string): void {
+    this.db
+      .prepare(
+        "UPDATE operator_sessions SET last_seen_at=?,idle_expires_at=? WHERE session_hash=? AND revoked_at IS NULL",
+      )
+      .run(new Date().toISOString(), idleExpiresAt, sessionHash);
+  }
+  revokeSession(sessionHash: string): void {
+    this.db
+      .prepare("UPDATE operator_sessions SET revoked_at=? WHERE session_hash=?")
+      .run(new Date().toISOString(), sessionHash);
+  }
+  recordAuthAttempt(sourceHash: string, succeeded: boolean): void {
+    this.db
+      .prepare("INSERT INTO auth_attempts(source_hash,attempted_at,succeeded) VALUES(?,?,?)")
+      .run(sourceHash, new Date().toISOString(), succeeded ? 1 : 0);
+  }
+  recentFailedAuth(sourceHash: string, since: string): number {
+    const row = this.db
+      .prepare(
+        "SELECT COUNT(*) count FROM auth_attempts WHERE source_hash=? AND attempted_at>=? AND succeeded=0",
+      )
+      .get(sourceHash, since) as { count: number };
+    return row.count;
+  }
+  consumeLimit(input: {
+    bucket: string;
+    subjectHash: string;
+    windowStart: string;
+    maxCount: number;
+    amountTinybars?: bigint;
+    maxAmountTinybars?: bigint;
+  }): { allowed: boolean; count: number; amountTinybars: bigint } {
+    return this.transaction(() => {
+      const row = this.db
+        .prepare(
+          "SELECT count,amount_tinybars FROM durable_limits WHERE bucket=? AND subject_hash=? AND window_start=?",
+        )
+        .get(input.bucket, input.subjectHash, input.windowStart) as
+        | { count: number; amount_tinybars: string }
+        | undefined;
+      const count = (row?.count ?? 0) + 1;
+      const amount = BigInt(row?.amount_tinybars ?? "0") + (input.amountTinybars ?? 0n);
+      if (
+        count > input.maxCount ||
+        (input.maxAmountTinybars !== undefined && amount > input.maxAmountTinybars)
+      )
+        return {
+          allowed: false,
+          count: count - 1,
+          amountTinybars: BigInt(row?.amount_tinybars ?? "0"),
+        };
+      const now = new Date().toISOString();
+      this.db
+        .prepare(
+          "INSERT INTO durable_limits(bucket,subject_hash,window_start,count,amount_tinybars,updated_at) VALUES(?,?,?,?,?,?) ON CONFLICT(bucket,subject_hash,window_start) DO UPDATE SET count=excluded.count,amount_tinybars=excluded.amount_tinybars,updated_at=excluded.updated_at",
+        )
+        .run(input.bucket, input.subjectHash, input.windowStart, count, amount.toString(), now);
+      return { allowed: true, count, amountTinybars: amount };
+    });
+  }
+  countTasks(states: readonly string[]): number {
+    if (!states.length) return 0;
+    const marks = states.map(() => "?").join(",");
+    const row = this.db
+      .prepare(`SELECT COUNT(*) count FROM tasks WHERE state IN (${marks})`)
+      .get(...states) as { count: number };
+    return row.count;
+  }
+  checkpoint(): void {
+    this.db.exec("PRAGMA wal_checkpoint(TRUNCATE)");
+  }
+  integrityCheck(): string {
+    const row = this.db.prepare("PRAGMA integrity_check").get() as { integrity_check: string };
+    return row.integrity_check;
+  }
   listEvents(id: string): Record<string, unknown>[] {
     return this.db.prepare("SELECT * FROM events WHERE task_id=? ORDER BY id").all(id) as Record<
       string,
@@ -234,6 +354,16 @@ export class DurableStore {
     return this.db
       .prepare("SELECT * FROM purchases WHERE task_id=? ORDER BY priority,resource_id")
       .all(taskId) as Record<string, unknown>[];
+  }
+  listRecoverablePurchases(): Record<string, unknown>[] {
+    return this.db
+      .prepare(
+        `SELECT * FROM purchases WHERE transaction_id IS NOT NULL AND
+         (settlement_state IN ('settling','ambiguous') OR
+          (settlement_state='settled' AND delivery_state!='delivered'))
+         ORDER BY updated_at`,
+      )
+      .all() as Record<string, unknown>[];
   }
   listReceipts(input: {
     limit: number;

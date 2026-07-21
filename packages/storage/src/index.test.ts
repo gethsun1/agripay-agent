@@ -19,7 +19,7 @@ describe("durable storage", () => {
     const s = new DurableStore(temp());
     s.migrate();
     expect(s.db.prepare("select count(*) count from schema_migrations").get()).toMatchObject({
-      count: 1,
+      count: 2,
     });
     s.close();
   });

@@ -8,6 +8,10 @@
       "types": "./src/index.ts",
       "import": "./dist/index.js"
     },
+    "./reconcile": {
+      "types": "./src/reconcile.ts",
+      "import": "./dist/reconcile.js"
+    },
     "./provision": {
       "types": "./src/provision.ts",
       "import": "./dist/provision.js"
@@ -19,6 +23,7 @@
   },
   "dependencies": {
     "@agripay/schemas": "workspace:*",
+    "@agripay/storage": "workspace:*",
     "@hashgraph/sdk": "2.74.0",
     "zod": "3.25.76"
   }
