@@ -7,10 +7,11 @@ x402 bounty. It plans which registered insights a question needs, evaluates each
 deterministic spending controls, pays on Hedera testnet, retries protected HTTP resources, and
 records public receipts.
 
-Phase 1 provides a genuine native-HBAR testnet vertical slice: protected weather fixture,
-HTTP 402 challenge, deterministic policy evaluation, buyer signature, facilitator verification
-and settlement, HTTP retry, delivered data, and a sanitized public receipt. Mock results remain
-labelled and never receive HashScan links.
+Phase 2 expands the genuine native-HBAR slice into an autonomous three-resource workflow:
+weather risk (5,000,000 tinybars), disease risk (7,000,000), and market intelligence
+(4,000,000). Groq proposes a strict resource-only plan; the immutable registry and deterministic
+policy retain all payment authority. SQLite makes task state, replay protection, receipts, and
+recovery durable. Mock results remain labelled and never receive HashScan links.
 
 ## Why x402 and Hedera
 
@@ -32,8 +33,11 @@ idempotency, changed requirements, duplicates, and replay attempts are rejected 
 - `packages/fixtures`: registered resources and demonstration data
 - `packages/policy`: deterministic payment authorization
 - `packages/payments`: strict Hedera exact-payment and provisioning code
-- `packages/agent`: deterministic buyer lifecycle and sanitized receipts
-- `apps/resource-server`: protected weather resource
+- `packages/storage`: SQLite migrations, task state, replay protection, backup and restore
+- `packages/planner`: strict Groq planner, safe discovery, synthesis, and deterministic fallback
+- `packages/agent`: durable multi-resource orchestration and sanitized receipts
+- `apps/agent-api`: bounded task, timeline, receipt, policy, catalogue, and health APIs
+- `apps/resource-server`: three protected fixture resources
 - `apps/facilitator`: verification, replay protection, and settlement
 - `docs/adr`: compatibility and architecture decisions
 
