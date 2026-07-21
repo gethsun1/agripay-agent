@@ -13,6 +13,11 @@ weather risk (5,000,000 tinybars), disease risk (7,000,000), and market intellig
 policy retain all payment authority. SQLite makes task state, replay protection, receipts, and
 recovery durable. Mock results remain labelled and never receive HashScan links.
 
+Phase 3 adds a premium responsive web application that makes this lifecycle inspectable without
+turning navigation or refresh into a payment action. It includes a safety-gated agent workspace,
+durable event timeline, receipt explorer, sanitized developer inspection, architecture page, and
+committed verified-evidence mode.
+
 ## Why x402 and Hedera
 
 x402 makes per-request payment part of ordinary HTTP: request, 402 requirements, signed
@@ -37,12 +42,21 @@ idempotency, changed requirements, duplicates, and replay attempts are rejected 
 - `packages/planner`: strict Groq planner, safe discovery, synthesis, and deterministic fallback
 - `packages/agent`: durable multi-resource orchestration and sanitized receipts
 - `apps/agent-api`: bounded task, timeline, receipt, policy, catalogue, and health APIs
+- `apps/web`: React/Vite frontend, component tests, and deterministic Playwright coverage
 - `apps/resource-server`: three protected fixture resources
 - `apps/facilitator`: verification, replay protection, and settlement
 - `docs/adr`: compatibility and architecture decisions
 
 See [local development](docs/local-development.md) and the [architecture](docs/architecture.md).
 Public testnet proof is recorded in [HashScan evidence](docs/hashscan-evidence.md).
+
+## Frontend routes
+
+- `/` — product narrative, catalogue, lifecycle and verified evidence
+- `/agent` — question composer, exact preflight, task timeline and payment controls
+- `/receipts` — bounded public receipt search and detail inspection
+- `/developer` — human and sanitized-JSON x402 inspection
+- `/about` — architecture, policy boundary, recovery and roadmap
 
 ## Disclosure
 

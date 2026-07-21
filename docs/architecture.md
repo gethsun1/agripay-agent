@@ -40,3 +40,11 @@ SQLite uses WAL, full synchronous writes, foreign keys, `BEGIN IMMEDIATE` claims
 constraints for task/resource, submission key, idempotency key, requirement/payment digest,
 nonce, and transaction ID. An ambiguous transaction is queried through the testnet mirror node
 before its state can advance; it is never blindly paid again.
+
+## Frontend integration
+
+The Vite/React frontend consumes strict Zod-parsed JSON. The API applies bounded bodies and
+pagination, CORS allowlisting, rate limiting, correlation IDs, stable errors, and idempotent task
+reuse. The browser uses bounded 1.5-second polling because Phase 2 does not expose SSE. It backs
+off after network failure, stops at terminal states, and cleans timers on unmount. Reloading a
+`?task=` route performs GET requests only and never repeats task creation or settlement.

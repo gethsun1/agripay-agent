@@ -9,3 +9,13 @@ Safe console evidence includes resource IDs, plan source, total, status codes, p
 IDs, HashScan URLs, delivery state, and synthesis source. It excludes keys, authorization headers,
 raw signed transactions, and database credentials. See [HashScan evidence](hashscan-evidence.md)
 for the recorded run.
+
+## Frontend demonstration
+
+Run `pnpm web:dev`, open `http://127.0.0.1:3000`, and follow the landing-page CTA. Demo mode is
+explicitly labelled and uses no real payment. Switching to live testnet reveals an exact maximum
+spend checkbox; the submit action remains disabled until confirmation. Ordinary visual and E2E
+tests intercept API calls with deterministic fixtures and never contact Hedera.
+
+Use `/receipts` and `/developer` for the strongest judge walkthrough: both default to committed
+historical evidence and are entirely read-only.

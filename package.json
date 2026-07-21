@@ -22,6 +22,9 @@
     "db:restore": "pnpm --filter @agripay/storage build && node packages/storage/dist/cli.js restore",
     "groq:models": "pnpm --filter @agripay/planner build && node packages/planner/dist/cli.js models",
     "demo:hedera:multi-resource": "pnpm --filter @agripay/live-test build && node apps/live-test/dist/multi.js",
+    "web:dev": "pnpm --filter @agripay/web dev",
+    "web:build": "pnpm --filter @agripay/web build",
+    "test:e2e": "pnpm --filter @agripay/web test:e2e",
     "check": "pnpm format && pnpm lint && pnpm typecheck && pnpm build && pnpm test"
   },
   "devDependencies": {

@@ -37,3 +37,18 @@ pnpm demo:hedera:multi-resource -- --confirm-live-testnet-spend
 It refuses non-testnet configuration, a task maximum other than 16,000,000 tinybars, missing
 credentials, insufficient balance, or a dry-run plan that does not contain exactly three
 resources. It is not run by CI.
+
+## Web application
+
+Start the API on port 3001 and run `pnpm web:dev`. The Vite development server proxies `/api`,
+`/health`, and `/ready`; set the public-only `VITE_API_URL` when using a different API origin.
+Never place keys or database credentials in a `VITE_*` variable.
+
+The frontend defaults to demo mode. Live testnet mode requires an explicit checkbox confirming
+the exact displayed maximum, and the API independently rejects missing or mismatched confirmation.
+Refresh, receipt inspection, developer inspection, and polling are read-only. Public task IDs are
+kept in the URL for durable recovery and are not written to browser storage.
+
+Run component tests with `pnpm test` and deterministic browser tests with `pnpm test:e2e` after
+installing Playwright's Chromium runtime dependencies. No E2E route is permitted to make a real
+Hedera payment.
