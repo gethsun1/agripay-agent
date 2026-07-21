@@ -75,6 +75,13 @@ describe("operator authentication", () => {
     expect(login.setCookie).toContain("SameSite=Strict");
     store.close();
   });
+  it("supports explicitly hardened cross-site cookies", async () => {
+    const { store, auth } = await setup({ secureCookies: true, sameSite: "None" });
+    const challenge = auth.issueLoginCsrf();
+    expect(challenge.setCookie).toContain("SameSite=None");
+    expect(challenge.setCookie).toContain("Secure");
+    store.close();
+  });
 });
 describe("CSRF and headers", () => {
   it("accepts a current matching login challenge", async () => {

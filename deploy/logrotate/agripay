@@ -1,4 +1,4 @@
-/var/log/agripay/*.log {
+/var/log/agripay-agent/*.log {
   daily
   rotate 14
   compress

@@ -63,14 +63,19 @@ export function parseCookies(header: string | undefined): Record<string, string>
       .filter((pair): pair is [string, string] => Boolean(pair[0] && pair[1])),
   );
 }
-const cookie = (name: string, value: string, input: { secure: boolean; maxAge: number }) =>
-  `${name}=${value}; Path=/; HttpOnly; SameSite=Strict; Max-Age=${String(input.maxAge)}${input.secure ? "; Secure" : ""}`;
+const cookie = (
+  name: string,
+  value: string,
+  input: { secure: boolean; maxAge: number; sameSite: "Strict" | "None" },
+) =>
+  `${name}=${value}; Path=/; HttpOnly; SameSite=${input.sameSite}; Max-Age=${String(input.maxAge)}${input.secure ? "; Secure" : ""}`;
 export interface SessionConfig {
   secret: string;
   idleTtlSeconds: number;
   absoluteTtlSeconds: number;
   secureCookies: boolean;
   passwordHash: string;
+  sameSite?: "Strict" | "None";
 }
 export interface OperatorSession {
   sessionHash: string;
@@ -95,6 +100,7 @@ export class OperatorAuth {
       setCookie: cookie(LOGIN_CSRF_COOKIE, token, {
         secure: this.config.secureCookies,
         maxAge: 300,
+        sameSite: this.config.sameSite ?? "Strict",
       }),
     };
   }
@@ -136,6 +142,7 @@ export class OperatorAuth {
       setCookie: cookie(SESSION_COOKIE, sessionId, {
         secure: this.config.secureCookies,
         maxAge: this.config.absoluteTtlSeconds,
+        sameSite: this.config.sameSite ?? "Strict",
       }),
     };
   }
@@ -169,7 +176,11 @@ export class OperatorAuth {
   }
   logout(session: OperatorSession): string {
     this.store.revokeSession(session.sessionHash);
-    return cookie(SESSION_COOKIE, "", { secure: this.config.secureCookies, maxAge: 0 });
+    return cookie(SESSION_COOKIE, "", {
+      secure: this.config.secureCookies,
+      maxAge: 0,
+      sameSite: this.config.sameSite ?? "Strict",
+    });
   }
 }
 export function securityHeaders(input: {

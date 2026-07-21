@@ -1,16 +1,15 @@
 [Unit]
-Description=AgriPay Agent API
-After=network-online.target agripay-resource.service agripay-facilitator.service
+Description=AgriPay internal x402 facilitator
+After=network-online.target
 Wants=network-online.target
-Requires=agripay-resource.service agripay-facilitator.service
 
 [Service]
 Type=simple
 User=agripay
 Group=agripay
 WorkingDirectory=/opt/agripay-agent/current
-EnvironmentFile=/etc/agripay-agent/api.env
-ExecStart=/opt/agripay-node/bin/node apps/agent-api/dist/server.js
+EnvironmentFile=/etc/agripay-agent/facilitator.env
+ExecStart=/opt/agripay-node/bin/node apps/facilitator/dist/server.js
 Restart=on-failure
 RestartSec=5
 UMask=0077
@@ -20,7 +19,7 @@ ProtectSystem=strict
 ProtectHome=true
 ReadWritePaths=/var/lib/agripay-agent /var/log/agripay-agent
 RestrictSUIDSGID=true
-MemoryMax=768M
+MemoryMax=512M
 TimeoutStopSec=30
 
 [Install]
