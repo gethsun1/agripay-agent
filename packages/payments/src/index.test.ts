@@ -6,6 +6,7 @@ import {
   hashscanTransactionUrl,
   redactSecrets,
   verifyPayment,
+  recoverSettlement,
 } from "./index.js";
 
 const buyerKey = PrivateKey.generateECDSA();
@@ -22,6 +23,37 @@ const requirements = (overrides: Partial<PaymentRequirements> = {}): PaymentRequ
   nonce: "0123456789abcdef",
   extra: { feePayer: "0.0.1003" },
   ...overrides,
+});
+
+describe("mirror recovery", () => {
+  it("confirms a successful transaction", async () => {
+    expect(
+      await recoverSettlement("0.0.3@1.2", () =>
+        Promise.resolve(
+          new Response(JSON.stringify({ transactions: [{ result: "SUCCESS" }] }), { status: 200 }),
+        ),
+      ),
+    ).toMatchObject({ state: "settled" });
+  });
+  it("keeps a missing transaction ambiguous", async () => {
+    expect(
+      await recoverSettlement("0.0.3@1.2", () =>
+        Promise.resolve(new Response("", { status: 404 })),
+      ),
+    ).toMatchObject({ state: "ambiguous" });
+  });
+  it("marks a definitive mirror failure", async () => {
+    expect(
+      await recoverSettlement("0.0.3@1.2", () =>
+        Promise.resolve(
+          new Response(
+            JSON.stringify({ transactions: [{ result: "INSUFFICIENT_ACCOUNT_BALANCE" }] }),
+            { status: 200 },
+          ),
+        ),
+      ),
+    ).toMatchObject({ state: "failed" });
+  });
 });
 
 describe("Hedera exact payment", () => {

@@ -1,5 +1,5 @@
 {
-  "name": "@agripay/facilitator",
+  "name": "@agripay/storage",
   "version": "0.1.0",
   "private": true,
   "type": "module",
@@ -10,11 +10,5 @@
   "scripts": {
     "build": "tsc -p tsconfig.json",
     "typecheck": "tsc -p tsconfig.json --noEmit"
-  },
-  "dependencies": {
-    "@agripay/payments": "workspace:*",
-    "@agripay/schemas": "workspace:*",
-    "@agripay/fixtures": "workspace:*",
-    "@agripay/storage": "workspace:*"
   }
 }

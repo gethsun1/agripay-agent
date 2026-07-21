@@ -1,8 +1,11 @@
 import { createServer, type Server } from "node:http";
 import { createHash } from "node:crypto";
+import { RESOURCE_REGISTRY } from "@agripay/fixtures";
+import { DurableStore } from "@agripay/storage";
 import { paymentPayloadSchema, paymentRequirementsSchema } from "@agripay/schemas";
 import {
   settlePayment,
+  recoverSettlement,
   verifyPayment,
   type HederaCredentials,
   type SettlementResult,
@@ -29,12 +32,12 @@ export interface FacilitatorOptions {
   expectedPriceTinybars: bigint;
   facilitator: HederaCredentials;
   settle?: typeof settlePayment;
+  store?: DurableStore;
+  recover?: typeof recoverSettlement;
 }
 
 export function createFacilitatorServer(options: FacilitatorOptions): Server {
-  const usedNonces = new Set<string>();
-  const settlingNonces = new Set<string>();
-  const settlements = new Map<string, { result: SettlementResult; digest: string }>();
+  const store = options.store ?? new DurableStore(":memory:");
   return createServer((request, response) => {
     void (async () => {
       response.setHeader("content-type", "application/json");
@@ -51,21 +54,31 @@ export function createFacilitatorServer(options: FacilitatorOptions): Server {
         if (request.url === "/status") {
           const nonce = typeof body.nonce === "string" ? body.nonce : "";
           const digest = typeof body.digest === "string" ? body.digest : "";
-          const settlement = settlements.get(nonce);
-          if (!settlement || settlement.digest !== digest) {
+          const settlement = store.getSettlement(nonce);
+          if (!settlement || settlement.payment_digest !== digest) {
             response.statusCode = 404;
             response.end(JSON.stringify({ state: "unknown" }));
             return;
           }
-          response.statusCode = settlement.result.state === "settled" ? 200 : 202;
-          response.end(JSON.stringify(settlement.result));
+          let result =
+            typeof settlement.result_json === "string"
+              ? (JSON.parse(settlement.result_json) as SettlementResult)
+              : { state: String(settlement.state) };
+          if (settlement.state === "ambiguous" && typeof settlement.transaction_id === "string") {
+            result = await (options.recover ?? recoverSettlement)(settlement.transaction_id);
+            store.finishSettlement(nonce, result);
+          }
+          response.statusCode =
+            result.state === "settled" ? 200 : result.state === "failed" ? 400 : 202;
+          response.end(JSON.stringify(result));
           return;
         }
         const payload = paymentPayloadSchema.parse(body.paymentPayload);
         const requirements = paymentRequirementsSchema.parse(body.paymentRequirements);
         if (
           requirements.payTo !== options.expectedSellerAccountId ||
-          BigInt(requirements.maxAmountRequired) !== options.expectedPriceTinybars ||
+          BigInt(requirements.maxAmountRequired) !==
+            RESOURCE_REGISTRY[requirements.resource].priceTinybars ||
           requirements.extra.feePayer !== options.facilitator.accountId
         ) {
           response.statusCode = 400;
@@ -77,7 +90,7 @@ export function createFacilitatorServer(options: FacilitatorOptions): Server {
           requirements,
           options.buyerAccountId,
           options.buyerPublicKey,
-          usedNonces,
+          new Set(store.getSettlement(requirements.nonce) ? [requirements.nonce] : []),
         );
         if (request.url === "/verify") {
           response.statusCode = verified.isValid ? 200 : 400;
@@ -93,25 +106,25 @@ export function createFacilitatorServer(options: FacilitatorOptions): Server {
           response.end(JSON.stringify({ state: "failed", reason: verified.reason }));
           return;
         }
-        if (settlingNonces.has(requirements.nonce)) {
+        const requirementDigest = createHash("sha256")
+          .update(JSON.stringify(requirements))
+          .digest("hex");
+        const paymentDigest = createHash("sha256")
+          .update(payload.payload.transaction)
+          .digest("hex");
+        if (
+          store.claimSettlement({ nonce: requirements.nonce, requirementDigest, paymentDigest }) ===
+          "existing"
+        ) {
           response.statusCode = 409;
           response.end(JSON.stringify({ state: "failed", reason: "settlement_in_progress" }));
           return;
         }
-        settlingNonces.add(requirements.nonce);
         const result: SettlementResult = await (options.settle ?? settlePayment)(
           verified,
           options.facilitator,
         );
-        if (result.state === "settled" || result.state === "ambiguous") {
-          usedNonces.add(requirements.nonce);
-          settlements.set(requirements.nonce, {
-            result,
-            digest: createHash("sha256").update(payload.payload.transaction).digest("hex"),
-          });
-        } else {
-          settlingNonces.delete(requirements.nonce);
-        }
+        store.finishSettlement(requirements.nonce, result);
         response.statusCode =
           result.state === "settled" ? 200 : result.state === "ambiguous" ? 202 : 400;
         response.end(JSON.stringify(result));

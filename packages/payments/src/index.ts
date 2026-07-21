@@ -51,6 +51,36 @@ export function hashscanAccountUrl(accountId: string): string {
   return `https://hashscan.io/testnet/account/${encodeURIComponent(accountId)}`;
 }
 
+export function mirrorNodeTransactionUrl(transactionId: string): string {
+  const match = /^(0\.0\.\d+)@(\d+)\.(\d+)$/.exec(transactionId);
+  if (!match) throw new Error("Invalid Hedera transaction ID");
+  const [, account, seconds, nanos] = match;
+  if (!account || !seconds || !nanos) throw new Error("Invalid Hedera transaction ID");
+  return `https://testnet.mirrornode.hedera.com/api/v1/transactions/${account}-${seconds}-${nanos}`;
+}
+
+export async function recoverSettlement(
+  transactionId: string,
+  fetcher: typeof fetch = fetch,
+): Promise<SettlementResult> {
+  try {
+    const response = await fetcher(mirrorNodeTransactionUrl(transactionId), {
+      signal: AbortSignal.timeout(10_000),
+    });
+    if (response.status === 404)
+      return { state: "ambiguous", reason: "mirror_transaction_not_yet_visible", transactionId };
+    if (!response.ok)
+      return { state: "ambiguous", reason: "mirror_query_unavailable", transactionId };
+    const body = (await response.json()) as { transactions?: { result?: string }[] };
+    const result = body.transactions?.[0]?.result;
+    if (result === "SUCCESS") return { state: "settled", transactionId };
+    if (result) return { state: "failed", reason: "hedera_transaction_failed" };
+    return { state: "ambiguous", reason: "mirror_result_unavailable", transactionId };
+  } catch {
+    return { state: "ambiguous", reason: "mirror_query_unavailable", transactionId };
+  }
+}
+
 export function createTestnetClient(credentials?: HederaCredentials): Client {
   const client = Client.forTestnet().setDefaultMaxTransactionFee(new Hbar(1));
   if (credentials) {
