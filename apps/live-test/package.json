@@ -11,7 +11,9 @@
     "@agripay/agent": "workspace:*",
     "@agripay/facilitator": "workspace:*",
     "@agripay/payments": "workspace:*",
+    "@agripay/planner": "workspace:*",
     "@agripay/resource-server": "workspace:*",
+    "@agripay/storage": "workspace:*",
     "@hashgraph/sdk": "2.74.0"
   }
 }

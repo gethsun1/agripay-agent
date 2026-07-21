@@ -5,7 +5,7 @@
   "license": "Apache-2.0",
   "packageManager": "pnpm@10.7.0",
   "engines": {
-    "node": ">=20"
+    "node": ">=24"
   },
   "scripts": {
     "build": "pnpm -r build",
@@ -17,6 +17,11 @@
     "test:watch": "vitest",
     "hedera:provision": "pnpm --filter @agripay/payments build && node packages/payments/dist/provision-cli.js",
     "test:hedera:testnet": "pnpm --filter @agripay/live-test build && node apps/live-test/dist/index.js",
+    "db:migrate": "pnpm --filter @agripay/storage build && node packages/storage/dist/cli.js migrate",
+    "db:backup": "pnpm --filter @agripay/storage build && node packages/storage/dist/cli.js backup",
+    "db:restore": "pnpm --filter @agripay/storage build && node packages/storage/dist/cli.js restore",
+    "groq:models": "pnpm --filter @agripay/planner build && node packages/planner/dist/cli.js models",
+    "demo:hedera:multi-resource": "pnpm --filter @agripay/live-test build && node apps/live-test/dist/multi.js",
     "check": "pnpm format && pnpm lint && pnpm typecheck && pnpm build && pnpm test"
   },
   "devDependencies": {

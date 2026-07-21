@@ -32,14 +32,32 @@ importers:
         specifier: 3.2.4
         version: 3.2.4(@types/node@24.0.15)(terser@5.49.0)(yaml@2.9.0)
 
+  apps/agent-api:
+    dependencies:
+      "@agripay/agent":
+        specifier: workspace:*
+        version: link:../../packages/agent
+      "@agripay/fixtures":
+        specifier: workspace:*
+        version: link:../../packages/fixtures
+      "@agripay/storage":
+        specifier: workspace:*
+        version: link:../../packages/storage
+
   apps/facilitator:
     dependencies:
+      "@agripay/fixtures":
+        specifier: workspace:*
+        version: link:../../packages/fixtures
       "@agripay/payments":
         specifier: workspace:*
         version: link:../../packages/payments
       "@agripay/schemas":
         specifier: workspace:*
         version: link:../../packages/schemas
+      "@agripay/storage":
+        specifier: workspace:*
+        version: link:../../packages/storage
 
   apps/live-test:
     dependencies:
@@ -52,9 +70,15 @@ importers:
       "@agripay/payments":
         specifier: workspace:*
         version: link:../../packages/payments
+      "@agripay/planner":
+        specifier: workspace:*
+        version: link:../../packages/planner
       "@agripay/resource-server":
         specifier: workspace:*
         version: link:../resource-server
+      "@agripay/storage":
+        specifier: workspace:*
+        version: link:../../packages/storage
       "@hashgraph/sdk":
         specifier: 2.74.0
         version: 2.74.0(bn.js@5.2.5)(react-native@0.86.0(@babel/core@7.29.7)(react@19.2.8))
@@ -76,24 +100,42 @@ importers:
       "@agripay/schemas":
         specifier: workspace:*
         version: link:../../packages/schemas
+      "@agripay/storage":
+        specifier: workspace:*
+        version: link:../../packages/storage
       "@hashgraph/sdk":
         specifier: 2.74.0
         version: 2.74.0(bn.js@5.2.5)(react-native@0.86.0(@babel/core@7.29.7)(react@19.2.8))
 
   packages/agent:
     dependencies:
+      "@agripay/facilitator":
+        specifier: workspace:*
+        version: link:../../apps/facilitator
       "@agripay/fixtures":
         specifier: workspace:*
         version: link:../fixtures
       "@agripay/payments":
         specifier: workspace:*
         version: link:../payments
+      "@agripay/planner":
+        specifier: workspace:*
+        version: link:../planner
       "@agripay/policy":
         specifier: workspace:*
         version: link:../policy
+      "@agripay/resource-server":
+        specifier: workspace:*
+        version: link:../../apps/resource-server
       "@agripay/schemas":
         specifier: workspace:*
         version: link:../schemas
+      "@agripay/storage":
+        specifier: workspace:*
+        version: link:../storage
+      "@hashgraph/sdk":
+        specifier: 2.74.0
+        version: 2.74.0(bn.js@5.2.5)(react-native@0.86.0(@babel/core@7.29.7)(react@19.2.8))
 
   packages/config:
     dependencies:
@@ -119,6 +161,12 @@ importers:
         specifier: 3.25.76
         version: 3.25.76
 
+  packages/planner:
+    dependencies:
+      "@agripay/schemas":
+        specifier: workspace:*
+        version: link:../schemas
+
   packages/policy:
     dependencies:
       "@agripay/schemas":
@@ -130,6 +178,8 @@ importers:
       zod:
         specifier: 3.25.76
         version: 3.25.76
+
+  packages/storage: {}
 
 packages:
   "@babel/code-frame@7.29.7":
