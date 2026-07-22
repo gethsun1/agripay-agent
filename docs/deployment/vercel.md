@@ -2,6 +2,8 @@
 
 Project: `gethsun1s-projects/agripay-agent`. The repository root is the project root; `vercel.json` builds only `@agripay/web` and publishes `apps/web/dist`. The sole browser environment variable is `VITE_API_URL=https://agripay-api.duckdns.org`.
 
+Production URL: `https://agripay-agent.vercel.app`. Initial verified deployment ID: `dpl_8SW9naAxCGKNfqjiZwjFfSGgsTuw`. Vercel SSO deployment protection is disabled for the public bounty site; Git-fork protection remains enabled.
+
 GitHub production deployments use the connected `main` branch. Manual fallback:
 
 ```bash

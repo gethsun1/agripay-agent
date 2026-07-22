@@ -52,7 +52,7 @@ Public testnet proof is recorded in [HashScan evidence](docs/hashscan-evidence.m
 
 ## Production
 
-The production API is available at <https://agripay-api.duckdns.org>. It runs in bounded mock mode with live Hedera payments disabled by default. The API, protected resource server, and facilitator run as separate non-root systemd services bound to loopback. See the [Contabo runbook](docs/deployment/contabo.md), [Vercel runbook](docs/deployment/vercel.md), and [rollback procedure](docs/deployment/rollback.md).
+The production frontend is <https://agripay-agent.vercel.app> and the API is <https://agripay-api.duckdns.org>. The backend runs in bounded mock mode with live Hedera payments disabled by default. The API, protected resource server, and facilitator run as separate non-root systemd services bound to loopback. See the [Contabo runbook](docs/deployment/contabo.md), [Vercel runbook](docs/deployment/vercel.md), and [rollback procedure](docs/deployment/rollback.md).
 
 ## Frontend routes
 
