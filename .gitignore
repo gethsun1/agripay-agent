@@ -16,3 +16,4 @@ artifacts/
 *.sqlite-*
 data/*.json
 .DS_Store
+.vercel

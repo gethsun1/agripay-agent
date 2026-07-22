@@ -28,3 +28,6 @@
 - Review residual dependency risk, rollback, backup/restore, and incident runbooks.
 - Confirm no VPS, Vercel, DNS, mainnet, or live payment changed during Phase 4.
 - Verify the remote branch matches the final submission SHA.
+- Confirm `https://agripay-api.duckdns.org/health` and `/ready` are healthy.
+- Confirm the Vercel production deployment and exact backend CORS origin.
+- Confirm the final server setting remains `LIVE_PAYMENTS_ENABLED=false` after any controlled demo.

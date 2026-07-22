@@ -19,3 +19,7 @@ tests intercept API calls with deterministic fixtures and never contact Hedera.
 
 Use `/receipts` and `/developer` for the strongest judge walkthrough: both default to committed
 historical evidence and are entirely read-only.
+
+## Production walkthrough
+
+Open the production frontend, confirm API status, and submit the combined Nandi maize prompt in Demo mode. Verify three 402 stages, three mock settlements, three delivered resources, and the completed synthesis. Show that mock receipts omit explorer links, then open `/receipts` to distinguish committed historical testnet evidence. Finally, switch to Live Testnet and demonstrate that authentication, exact confirmation, and the server-side disabled kill switch prevent execution. Page loads and refreshes never initiate payments.

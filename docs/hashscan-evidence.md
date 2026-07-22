@@ -1,5 +1,7 @@
 # Hedera testnet evidence
 
+Production was initially deployed in mock mode with `LIVE_PAYMENTS_ENABLED=false`; deployment verification spent zero HBAR and created no new transaction IDs. The evidence below remains the verified historical testnet record.
+
 ## Phase 2 multi-resource task
 
 Recorded 2026-07-22. Groq (`llama-3.3-70b-versatile`) returned a schema-valid plan for all three
