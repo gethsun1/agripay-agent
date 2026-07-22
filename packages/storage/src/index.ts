@@ -497,7 +497,7 @@ export class DurableStore {
   periodSpend(since: string): bigint {
     const row = this.db
       .prepare(
-        "SELECT COALESCE(SUM(CAST(amount_tinybars AS INTEGER)),0) total FROM purchases WHERE settlement_state='settled' AND updated_at>=?",
+        "SELECT COALESCE(SUM(CAST(amount_tinybars AS INTEGER)),0) total FROM purchases WHERE settlement_state='settled' AND transaction_id NOT LIKE 'mock-%' AND updated_at>=?",
       )
       .get(since) as { total: number };
     return BigInt(row.total);

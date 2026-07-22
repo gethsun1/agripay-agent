@@ -96,6 +96,24 @@ describe("durable storage", () => {
     expect(s.getSettlement("n")).toMatchObject({ state: "ambiguous", transaction_id: "tx" });
     s.close();
   });
+  it("excludes mock settlements from real period spend", () => {
+    const store = new DurableStore(temp());
+    store.createTask({ id: "mock-task", correlationId: "mock-correlation", question: "mock" });
+    store.addPurchase({
+      taskId: "mock-task",
+      resourceId: "weather-risk",
+      rationale: "demo",
+      priority: 1,
+      idempotencyKey: "mock-payment",
+      amountTinybars: 5_000_000n,
+    });
+    store.updatePurchase("mock-task", "weather-risk", {
+      settlementState: "settled",
+      transactionId: "mock-transaction",
+    });
+    expect(store.periodSpend("2000-01-01T00:00:00.000Z")).toBe(0n);
+    store.close();
+  });
   it("creates a restorable SQLite backup", async () => {
     const p = temp(),
       b = `${p}.bak`;
