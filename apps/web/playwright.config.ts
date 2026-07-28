@@ -1,4 +1,5 @@
 import { defineConfig, devices } from "@playwright/test";
+const ciBrowser = process.env.CI ? { channel: "chrome" as const } : {};
 export default defineConfig({
   testDir: "./e2e",
   timeout: 20_000,
@@ -9,13 +10,14 @@ export default defineConfig({
     reuseExistingServer: true,
   },
   projects: [
-    { name: "chromium", use: { ...devices["Desktop Chrome"] } },
+    { name: "chromium", use: { ...devices["Desktop Chrome"], ...ciBrowser } },
     {
       name: "mobile-375",
       use: {
         ...devices["iPhone 13"],
         browserName: "chromium",
         viewport: { width: 375, height: 812 },
+        ...ciBrowser,
       },
     },
   ],
