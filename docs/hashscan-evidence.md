@@ -1,6 +1,21 @@
 # Hedera testnet evidence
 
-Production was initially deployed in mock mode with `LIVE_PAYMENTS_ENABLED=false`; deployment verification spent zero HBAR and created no new transaction IDs. The evidence below remains the verified historical testnet record.
+## Final controlled demo
+
+Recorded 2026-07-29. Task `99fe2e5d-b4de-44bb-b93b-6acf0fcdcdb6` used a schema-valid Groq
+plan, but the model selected two resources rather than the requested three. The deterministic
+preflight approved the selected 11,000,000-tinybar total. Both resources independently followed
+HTTP 402 → policy approval → verified settlement → payment-proof retry → validated HTTP 200,
+and the final Groq synthesis completed. No weather payment was attempted.
+
+| Resource              | Amount (tinybars) | Transaction ID                     | Public evidence                                                                                                                                                                                  | Delivery |
+| --------------------- | ----------------: | ---------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ | -------- |
+| `market-intelligence` |         4,000,000 | `0.0.9676583@1785273583.252225695` | [HashScan](https://hashscan.io/testnet/transaction/0.0.9676583-1785273583-252225695) · [mirror node](https://testnet.mirrornode.hedera.com/api/v1/transactions/0.0.9676583-1785273583-252225695) | HTTP 200 |
+| `disease-risk`        |         7,000,000 | `0.0.9676583@1785273586.910008234` | [HashScan](https://hashscan.io/testnet/transaction/0.0.9676583-1785273586-910008234) · [mirror node](https://testnet.mirrornode.hedera.com/api/v1/transactions/0.0.9676583-1785273586-910008234) | HTTP 200 |
+
+Independent mirror-node queries returned `SUCCESS` and exact buyer debits/seller credits of
+4,000,000 and 7,000,000 tinybars. Total resource spend was 11,000,000 tinybars (0.11 HBAR).
+Live payments were disabled immediately after the task reached its terminal state.
 
 ## Phase 2 multi-resource task
 
