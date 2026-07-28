@@ -63,6 +63,12 @@ async function setup(
 }
 
 describe("weather x402 vertical slice", () => {
+  it("reports both resource and facilitator health without spending", async () => {
+    const { resourceUrl, facilitatorUrl } = await setup();
+    expect(await (await fetch(`${resourceUrl}/health`)).json()).toEqual({ status: "ok" });
+    expect(await (await fetch(`${facilitatorUrl}/health`)).json()).toEqual({ status: "ok" });
+  });
+
   it("validates required query parameters", async () => {
     const { resourceUrl } = await setup();
     const response = await fetch(`${resourceUrl}/api/resources/weather-risk?county=Nandi`);

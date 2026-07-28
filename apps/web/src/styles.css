@@ -1415,11 +1415,13 @@ footer > div {
     display: block;
   }
   .hero {
-    grid-template-columns: 1fr;
+    grid-template-columns: minmax(0, 1fr);
     padding-top: 70px;
   }
   .hero-visual {
     min-height: 400px;
+    min-width: 0;
+    width: 100%;
   }
   .orbit {
     width: min(500px, 75vw);
@@ -1475,8 +1477,21 @@ footer > div {
     padding: 54px 18px;
     min-height: 0;
   }
+  .hero-copy {
+    min-width: 0;
+  }
+  .eyebrow-row {
+    align-items: flex-start;
+    flex-direction: column;
+    gap: 10px;
+    margin-bottom: 28px;
+  }
   .hero h1 {
-    font-size: 45px;
+    font-size: clamp(40px, 12vw, 45px);
+    overflow-wrap: break-word;
+  }
+  .hero h1 em {
+    display: block;
   }
   .hero-trust {
     display: grid;

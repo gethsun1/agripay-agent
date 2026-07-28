@@ -41,6 +41,10 @@ export function createFacilitatorServer(options: FacilitatorOptions): Server {
   return createServer((request, response) => {
     void (async () => {
       response.setHeader("content-type", "application/json");
+      if (request.method === "GET" && request.url === "/health") {
+        response.end(JSON.stringify({ status: "ok" }));
+        return;
+      }
       if (
         request.method !== "POST" ||
         !["/verify", "/settle", "/status"].includes(request.url ?? "")

@@ -43,6 +43,11 @@ describe("frontend API safety contract", () => {
     const { url, store } = await setup();
     expect(await (await fetch(`${url}/health`)).json()).toEqual({ status: "ok" });
     expect(await (await fetch(`${url}/ready`)).json()).toMatchObject({ database: true });
+    expect(await (await fetch(`${url}/api/network/status`)).json()).toMatchObject({
+      network: "hedera-testnet",
+      livePaymentsEnabled: false,
+      mainnetAllowed: false,
+    });
     expect(await (await fetch(`${url}/api/policies/public`)).json()).toMatchObject({
       network: "hedera-testnet",
       maxTaskTinybars: "16000000",

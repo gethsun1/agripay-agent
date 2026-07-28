@@ -55,6 +55,10 @@ export function createResourceServer(options: ResourceServerOptions): Server {
     void (async () => {
       response.setHeader("content-type", "application/json");
       const url = new URL(request.url ?? "/", "http://localhost");
+      if (request.method === "GET" && url.pathname === "/health") {
+        response.end(JSON.stringify({ status: "ok" }));
+        return;
+      }
       if (request.method === "GET" && url.pathname === "/api/resources/catalogue") {
         response.end(
           JSON.stringify(

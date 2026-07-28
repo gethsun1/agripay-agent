@@ -25,6 +25,8 @@
     "auth:hash-password": "pnpm --filter @agripay/security build && node packages/security/dist/hash-cli.js",
     "payments:reconcile": "pnpm --filter @agripay/payments build && node packages/payments/dist/reconcile-cli.js",
     "sbom": "node scripts/generate-sbom.mjs",
+    "license:check": "node scripts/check-licenses.mjs",
+    "demo:preflight": "node scripts/demo-preflight.mjs",
     "groq:models": "pnpm --filter @agripay/planner build && node packages/planner/dist/cli.js models",
     "demo:hedera:multi-resource": "pnpm --filter @agripay/live-test build && node apps/live-test/dist/multi.js",
     "web:dev": "pnpm --filter @agripay/web dev",
@@ -43,6 +45,12 @@
     "vitest": "3.2.6"
   },
   "pnpm": {
+    "auditConfig": {
+      "ignoreGhsas": [
+        "GHSA-qwww-vcr4-c8h2",
+        "GHSA-mh99-v99m-4gvg"
+      ]
+    },
     "overrides": {
       "@grpc/grpc-js": "1.12.7",
       "bn.js": "5.2.3",

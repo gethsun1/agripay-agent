@@ -67,6 +67,7 @@ export type AgentApiOptions = Omit<TaskOptions, "question" | "submissionKey"> & 
   maxConcurrentLiveTasks?: number;
   maxAmbiguousTasks?: number;
   logger?: Logger;
+  checkInternalReadiness?: boolean;
 };
 export function createAgentApiServer(options: AgentApiOptions): Server {
   if (
@@ -284,7 +285,24 @@ export function createAgentApiServer(options: AgentApiOptions): Server {
         return;
       }
       if (request.method === "GET" && url.pathname === "/ready") {
-        send(response, 200, { status: "ready", database: true }, correlationId);
+        let dependencies = true;
+        if (options.checkInternalReadiness) {
+          const checks = await Promise.allSettled(
+            [options.resourceServerUrl, options.facilitatorUrl].map(async (base) => {
+              const check = await fetch(new URL("/health", base), {
+                signal: AbortSignal.timeout(2_000),
+              });
+              if (!check.ok) throw new Error("dependency_not_ready");
+            }),
+          );
+          dependencies = checks.every((check) => check.status === "fulfilled");
+        }
+        send(
+          response,
+          dependencies ? 200 : 503,
+          { status: dependencies ? "ready" : "not_ready", database: true, dependencies },
+          correlationId,
+        );
         return;
       }
       if (request.method === "GET" && url.pathname === "/api/network/status") {
@@ -294,6 +312,7 @@ export function createAgentApiServer(options: AgentApiOptions): Server {
           {
             network: "hedera-testnet",
             mode: options.mode ?? "mock",
+            livePaymentsEnabled: options.livePaymentsEnabled ?? false,
             mainnetAllowed: false,
             buyerAccountId: options.buyer.accountId,
             sellerAccountId: options.sellerAccountId,

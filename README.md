@@ -7,16 +7,38 @@ x402 bounty. It plans which registered insights a question needs, evaluates each
 deterministic spending controls, pays on Hedera testnet, retries protected HTTP resources, and
 records public receipts.
 
-Phase 2 expands the genuine native-HBAR slice into an autonomous three-resource workflow:
-weather risk (5,000,000 tinybars), disease risk (7,000,000), and market intelligence
-(4,000,000). Groq proposes a strict resource-only plan; the immutable registry and deterministic
-policy retain all payment authority. SQLite makes task state, replay protection, receipts, and
-recovery durable. Mock results remain labelled and never receive HashScan links.
+**[Live app](https://agripay-agent.vercel.app)** ·
+**[Public API](https://agripay-api.duckdns.org/health)** ·
+**[4-minute demo script](docs/video-script.md)** ·
+**[On-chain evidence](docs/hashscan-evidence.md)** ·
+**[Judge guide](docs/judging-guide.md)**
 
-Phase 3 adds a premium responsive web application that makes this lifecycle inspectable without
-turning navigation or refresh into a payment action. It includes a safety-gated agent workspace,
-durable event timeline, receipt explorer, sanitized developer inspection, architecture page, and
-committed verified-evidence mode.
+In the demo, one Nandi maize question makes Groq select three registered intelligence resources.
+Each produces a real HTTP 402, an independent native-HBAR testnet settlement, and an HTTP 200
+retry. The total is exactly 0.16 HBAR. Groq may choose resources, but only immutable registry data
+and deterministic policy can authorize the recipient, asset, network, and amount.
+
+```mermaid
+flowchart LR
+  Q[Question] --> G[Groq plan]
+  G --> P[Deterministic preflight]
+  P --> R[Protected resources]
+  R -->|HTTP 402| W[Policy-controlled wallet]
+  W --> H[Hedera testnet settlement]
+  H -->|payment proof + retry| R
+  R -->|HTTP 200| S[Validated synthesis + receipts]
+```
+
+### Verified three-resource evidence
+
+| Resource            | HTTP lifecycle     |    Amount | Transaction                        | Public proof                                                                                                                                                                                                              | Status    |
+| ------------------- | ------------------ | --------: | ---------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | --------- |
+| Disease risk        | 402 → settle → 200 | 0.07 HBAR | `0.0.9676583-1784671641-501210796` | [HashScan](https://hashscan.io/testnet/transaction/1784671641.501210796?tid=0.0.9676583-1784671641-501210796) · [Mirror node](https://testnet.mirrornode.hedera.com/api/v1/transactions/0.0.9676583-1784671641-501210796) | Delivered |
+| Weather risk        | 402 → settle → 200 | 0.05 HBAR | `0.0.9676583-1784671645-343987679` | [HashScan](https://hashscan.io/testnet/transaction/1784671645.343987679?tid=0.0.9676583-1784671645-343987679) · [Mirror node](https://testnet.mirrornode.hedera.com/api/v1/transactions/0.0.9676583-1784671645-343987679) | Delivered |
+| Market intelligence | 402 → settle → 200 | 0.04 HBAR | `0.0.9676583-1784671645-928120887` | [HashScan](https://hashscan.io/testnet/transaction/1784671645.928120887?tid=0.0.9676583-1784671645-928120887) · [Mirror node](https://testnet.mirrornode.hedera.com/api/v1/transactions/0.0.9676583-1784671645-928120887) | Delivered |
+
+The agricultural providers currently return curated demonstration fixtures—not live agronomic
+advice. The payment, policy, persistence, and public-ledger paths are genuine.
 
 ## Why x402 and Hedera
 
@@ -53,6 +75,14 @@ Public testnet proof is recorded in [HashScan evidence](docs/hashscan-evidence.m
 ## Production
 
 The production frontend is <https://agripay-agent.vercel.app> and the API is <https://agripay-api.duckdns.org>. The backend runs in bounded mock mode with live Hedera payments disabled by default. The API, protected resource server, and facilitator run as separate non-root systemd services bound to loopback. See the [Contabo runbook](docs/deployment/contabo.md), [Vercel runbook](docs/deployment/vercel.md), and [rollback procedure](docs/deployment/rollback.md).
+
+For a 60-second, non-spending verification:
+
+```bash
+corepack enable
+pnpm install --frozen-lockfile
+pnpm demo:preflight
+```
 
 ## Frontend routes
 

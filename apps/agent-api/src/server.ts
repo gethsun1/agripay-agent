@@ -50,6 +50,7 @@ const server = createAgentApiServer({
   maxLiveTasksPerPeriod: Number(process.env.MAX_LIVE_TASKS_PER_PERIOD ?? "1"),
   maxConcurrentLiveTasks: Number(process.env.MAX_CONCURRENT_LIVE_TASKS ?? "1"),
   maxAmbiguousTasks: Number(process.env.MAX_AMBIGUOUS_TASKS ?? "1"),
+  checkInternalReadiness: true,
   groq: {
     ...(process.env.GROQ_API_KEY ? { apiKey: process.env.GROQ_API_KEY } : {}),
     ...(process.env.GROQ_MODEL ? { model: process.env.GROQ_MODEL } : {}),

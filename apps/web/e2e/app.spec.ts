@@ -1,6 +1,9 @@
 import { expect, test, type Page } from "@playwright/test";
 async function mockTask(page: Page, state = "completed") {
   let posts = 0;
+  await page.route("**/api/auth/csrf", (route) =>
+    route.fulfill({ json: { csrfToken: "test-csrf-token" }, status: 200 }),
+  );
   await page.route("**/api/agent/tasks", async (route) => {
     posts++;
     await route.fulfill({
@@ -76,6 +79,9 @@ test("Groq fallback and partial task are legible", async ({ page }) => {
   await expect(page.getByText("Partial result delivered")).toBeVisible();
 });
 test("budget rejection is presented safely", async ({ page }) => {
+  await page.route("**/api/auth/csrf", (route) =>
+    route.fulfill({ json: { csrfToken: "test-csrf-token" }, status: 200 }),
+  );
   await page.route("**/api/agent/tasks", (route) =>
     route.fulfill({
       status: 409,
