@@ -100,7 +100,7 @@ export function hashscanUrl(transactionId: string) {
   if (!m) return "";
   const [, account, seconds, nanos] = m;
   if (!account || !seconds || !nanos) return "";
-  return `https://hashscan.io/testnet/transaction/${seconds}.${nanos}?tid=${account}-${seconds}-${nanos}`;
+  return `https://hashscan.io/testnet/transaction/${account}-${seconds}-${nanos}`;
 }
 export function mirrorUrl(transactionId: string) {
   const m = /^(0\.0\.\d+)@(\d+)\.(\d+)$/.exec(transactionId);

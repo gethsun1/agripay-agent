@@ -31,11 +31,11 @@ flowchart LR
 
 ### Verified three-resource evidence
 
-| Resource            | HTTP lifecycle     |    Amount | Transaction                        | Public proof                                                                                                                                                                                                              | Status    |
-| ------------------- | ------------------ | --------: | ---------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | --------- |
-| Disease risk        | 402 → settle → 200 | 0.07 HBAR | `0.0.9676583-1784671641-501210796` | [HashScan](https://hashscan.io/testnet/transaction/1784671641.501210796?tid=0.0.9676583-1784671641-501210796) · [Mirror node](https://testnet.mirrornode.hedera.com/api/v1/transactions/0.0.9676583-1784671641-501210796) | Delivered |
-| Weather risk        | 402 → settle → 200 | 0.05 HBAR | `0.0.9676583-1784671645-343987679` | [HashScan](https://hashscan.io/testnet/transaction/1784671645.343987679?tid=0.0.9676583-1784671645-343987679) · [Mirror node](https://testnet.mirrornode.hedera.com/api/v1/transactions/0.0.9676583-1784671645-343987679) | Delivered |
-| Market intelligence | 402 → settle → 200 | 0.04 HBAR | `0.0.9676583-1784671645-928120887` | [HashScan](https://hashscan.io/testnet/transaction/1784671645.928120887?tid=0.0.9676583-1784671645-928120887) · [Mirror node](https://testnet.mirrornode.hedera.com/api/v1/transactions/0.0.9676583-1784671645-928120887) | Delivered |
+| Resource            | HTTP lifecycle     |    Amount | Transaction                        | Public proof                                                                                                                                                                                     | Status    |
+| ------------------- | ------------------ | --------: | ---------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ | --------- |
+| Disease risk        | 402 → settle → 200 | 0.07 HBAR | `0.0.9676583-1784671641-501210796` | [HashScan](https://hashscan.io/testnet/transaction/0.0.9676583-1784671641-501210796) · [Mirror node](https://testnet.mirrornode.hedera.com/api/v1/transactions/0.0.9676583-1784671641-501210796) | Delivered |
+| Weather risk        | 402 → settle → 200 | 0.05 HBAR | `0.0.9676583-1784671645-343987679` | [HashScan](https://hashscan.io/testnet/transaction/0.0.9676583-1784671645-343987679) · [Mirror node](https://testnet.mirrornode.hedera.com/api/v1/transactions/0.0.9676583-1784671645-343987679) | Delivered |
+| Market intelligence | 402 → settle → 200 | 0.04 HBAR | `0.0.9676583-1784671645-928120887` | [HashScan](https://hashscan.io/testnet/transaction/0.0.9676583-1784671645-928120887) · [Mirror node](https://testnet.mirrornode.hedera.com/api/v1/transactions/0.0.9676583-1784671645-928120887) | Delivered |
 
 The agricultural providers currently return curated demonstration fixtures—not live agronomic
 advice. The payment, policy, persistence, and public-ledger paths are genuine.

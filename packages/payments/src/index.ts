@@ -42,9 +42,8 @@ export function hashscanTransactionUrl(transactionId: string): string {
   const seconds = match[2];
   const nanos = match[3];
   if (!accountId || !seconds || !nanos) throw new Error("Invalid Hedera transaction ID");
-  const timestamp = `${seconds}.${nanos}`;
   const mirrorId = `${accountId}-${seconds}-${nanos}`;
-  return `https://hashscan.io/testnet/transaction/${timestamp}?tid=${encodeURIComponent(mirrorId)}`;
+  return `https://hashscan.io/testnet/transaction/${encodeURIComponent(mirrorId)}`;
 }
 
 export function hashscanAccountUrl(accountId: string): string {

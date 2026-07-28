@@ -124,7 +124,7 @@ describe("Hedera exact payment", () => {
 
   it("creates the documented HashScan testnet transaction route", () => {
     expect(hashscanTransactionUrl("0.0.1003@1784667109.208338088")).toBe(
-      "https://hashscan.io/testnet/transaction/1784667109.208338088?tid=0.0.1003-1784667109-208338088",
+      "https://hashscan.io/testnet/transaction/0.0.1003-1784667109-208338088",
     );
   });
 });

@@ -11,7 +11,7 @@ describe("public presentation utilities", () => {
     expect(formatTinybars(input)).toBe(expected);
   });
   it("creates exact testnet evidence links", () => {
-    expect(hashscanUrl("0.0.3@10.20")).toContain("10.20?tid=0.0.3-10-20");
+    expect(hashscanUrl("0.0.3@10.20")).toContain("transaction/0.0.3-10-20");
     expect(mirrorUrl("0.0.3@10.20")).toContain("0.0.3-10-20");
   });
   it("sorts and suppresses duplicate timeline events", () => {

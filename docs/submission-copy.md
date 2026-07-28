@@ -94,10 +94,10 @@ WAL persistence; Nginx/TLS on a Contabo VPS; Vercel frontend.
 - Repository: <https://github.com/gethsun1/agripay-agent>
 - Live application: <https://agripay-agent.vercel.app>
 - Backend/API: <https://agripay-api.duckdns.org>
-- Phase 1 HashScan: <https://hashscan.io/testnet/transaction/1784668506.369008592?tid=0.0.9676583-1784668506-369008592>
-- Disease HashScan: <https://hashscan.io/testnet/transaction/1784671641.501210796?tid=0.0.9676583-1784671641-501210796>
-- Weather HashScan: <https://hashscan.io/testnet/transaction/1784671645.343987679?tid=0.0.9676583-1784671645-343987679>
-- Market HashScan: <https://hashscan.io/testnet/transaction/1784671645.928120887?tid=0.0.9676583-1784671645-928120887>
+- Phase 1 HashScan: <https://hashscan.io/testnet/transaction/0.0.9676583-1784668506-369008592>
+- Disease HashScan: <https://hashscan.io/testnet/transaction/0.0.9676583-1784671641-501210796>
+- Weather HashScan: <https://hashscan.io/testnet/transaction/0.0.9676583-1784671645-343987679>
+- Market HashScan: <https://hashscan.io/testnet/transaction/0.0.9676583-1784671645-928120887>
 - Demo video: **[ADD FINAL PUBLIC VIDEO URL]**
 - Builder/team: **[ADD BUILDER NAME, ROLE, LOCATION, AND CONTACT]**
 
