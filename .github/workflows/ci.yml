@@ -19,7 +19,14 @@ jobs:
       - run: pnpm install --frozen-lockfile
       - run: pnpm audit --audit-level high
       - run: pnpm check
-      - run: pnpm exec playwright install --with-deps chromium
+      - name: Install Playwright Chromium and OS dependencies
+        run: |
+          for attempt in 1 2 3; do
+            pnpm exec playwright install --with-deps chromium && exit 0
+            echo "Playwright install attempt ${attempt} failed; retrying"
+            sleep 10
+          done
+          exit 1
       - run: pnpm test:e2e
       - run: pnpm sbom
       - run: pnpm license:check
