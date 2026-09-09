@@ -35,7 +35,7 @@
     "check": "pnpm format && pnpm lint && pnpm typecheck && pnpm build && pnpm test"
   },
   "devDependencies": {
-    "@eslint/js": "9.31.0",
+    "@eslint/js": "9.39.5",
     "@types/node": "24.0.15",
     "eslint": "9.31.0",
     "eslint-config-prettier": "10.1.8",
